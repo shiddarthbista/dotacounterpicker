@@ -3,19 +3,18 @@ package bista.shiddarth.dotacounterpicker.service
 import bista.shiddarth.dotacounterpicker.model.HeroStats
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
 class CounterService(val openDotaClient: WebClient) {
 
-    fun getTopFiveCounters(heroName:String): List<String> {
+    fun getTopFiveCounters(heroName: String): List<String> {
 
-        return listOf("A","V","v","r","t")
+        return listOf("A", "V", "v", "r", "t")
     }
 
     fun getAllCounters(heroName: String): Mono<MutableList<HeroStats>> {
-        val response =  openDotaClient.get()
+        val response = openDotaClient.get()
             .uri("heroes/$heroName/matchups")
             .retrieve()
             .bodyToFlux(HeroStats::class.java)
@@ -31,7 +30,6 @@ class CounterService(val openDotaClient: WebClient) {
             .collectList()
 
     }
-
 
 
 }

@@ -18,13 +18,15 @@ internal class CounterControllerTest {
         @Test
         fun `5 counters are returned`() {
             every { counterService.getTopFiveCounters("Axe") } returns listOf(
-                "Beast","Drow","Bat Rider","Tusk", "Bane"
+                "Beast", "Drow", "Bat Rider", "Tusk", "Bane"
             )
 
             val result = testController.getCounters("Axe")
-            assertThat(result).isEqualTo(listOf(
-                "Beast","Drow","Bat Rider","Tusk", "Bane"
-            ))
+            assertThat(result).isEqualTo(
+                listOf(
+                    "Beast", "Drow", "Bat Rider", "Tusk", "Bane"
+                )
+            )
         }
     }
 
