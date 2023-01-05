@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono
 @Service
 class CounterService(val openDotaClient: WebClient) {
 
-    fun getTopFiveCounters(heroName: String): Mono<List<String?>> {
+    fun getTopFiveCounters(heroName: String): Mono<List<String>> {
         val heroId = getHeroIdFromHeroName(heroName)
         val heroStatsList = getTopFiveCounterHeroStats(heroId)
         val heroIdOfCounters = heroStatsList.map { heroStatsMutableList ->
@@ -18,7 +18,7 @@ class CounterService(val openDotaClient: WebClient) {
         }
         val heroNameOfCounters = heroIdOfCounters.map { heroNameList ->
             heroNameList.map {heroId ->
-                HeroMap.heroIdMap.entries.firstOrNull { it.value == heroId }?.key
+                HeroMap.heroIdMap.entries.first { it.value == heroId }.key
             }
         }
         return heroNameOfCounters
@@ -29,7 +29,7 @@ class CounterService(val openDotaClient: WebClient) {
         try {
             return HeroMap.heroIdMap.getValue(heroNameBasic)
         } catch (e: NoSuchElementException) {
-            throw InvalidHeroNameException("Cannot find such hero in the Archronicus")
+            throw InvalidHeroNameException("$heroName does not exist in the Archronicus.")
         }
     }
 
