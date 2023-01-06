@@ -2,14 +2,15 @@ package bista.shiddarth.dotacounterpicker.controller
 
 import bista.shiddarth.dotacounterpicker.service.CounterService
 import bista.shiddarth.dotacounterpicker.service.MatchupService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class CounterController(
-    private val counterService: CounterService,
-    private val matchupService: MatchupService
+    @Autowired private val counterService: CounterService,
+    @Autowired private val matchupService: MatchupService
 ) {
 
     @GetMapping("/counters/{heroName}")
