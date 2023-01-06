@@ -1,8 +1,7 @@
 package bista.shiddarth.dotacounterpicker.service
 
-import bista.shiddarth.dotacounterpicker.exception.InvalidHeroNameException
-import bista.shiddarth.dotacounterpicker.model.HeroMap
 import bista.shiddarth.dotacounterpicker.model.HeroStats
+import bista.shiddarth.dotacounterpicker.utils.ConverterUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -16,7 +15,7 @@ class CounterService(val openDotaClient: WebClient) {
 
     fun getTopFiveCounters(heroName: String): Mono<List<String>> {
         log.info("Received request to get counters for $heroName")
-        val heroId = getHeroIdFromHeroName(heroName)
+        val heroId = ConverterUtils.getHeroIdFromHeroName(heroName)
         log.info("Hero id for $heroName is $heroId")
         val heroStatsList = getTopFiveCounterHeroStats(heroId)
         val heroIdOfCounters = heroStatsList.map { heroStatsMutableList ->
@@ -24,19 +23,10 @@ class CounterService(val openDotaClient: WebClient) {
         }
         val heroNameOfCounters = heroIdOfCounters.map { heroNameList ->
             heroNameList.map { heroId ->
-                getHeroNameFromHeroId(heroId)
+                ConverterUtils.getHeroNameFromHeroId(heroId)
             }
         }
         return heroNameOfCounters
-    }
-
-    fun getHeroIdFromHeroName(heroName: String): Int {
-        val heroNameBasic = heroName.lowercase().filter { !it.isWhitespace() }
-        try {
-            return HeroMap.heroIdMap.getValue(heroNameBasic)
-        } catch (e: NoSuchElementException) {
-            throw InvalidHeroNameException("$heroName does not exist in the Archronicus.")
-        }
     }
 
     fun getTopFiveCounterHeroStats(heroId: Int): Mono<MutableList<HeroStats>> {
@@ -60,7 +50,4 @@ class CounterService(val openDotaClient: WebClient) {
             .bodyToFlux(HeroStats::class.java)
     }
 
-    fun getHeroNameFromHeroId(heroId: Int) =
-        HeroMap.heroIdMap.entries.first { it.value == heroId }.key
-    
 }
