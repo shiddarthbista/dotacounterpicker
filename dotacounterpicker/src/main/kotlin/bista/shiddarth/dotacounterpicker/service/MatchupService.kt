@@ -30,5 +30,4 @@ class MatchupService (private val counterService: CounterService){
             }
             .single()
     }
-
 }
