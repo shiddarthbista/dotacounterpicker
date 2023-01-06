@@ -1,14 +1,11 @@
 package bista.shiddarth.dotacounterpicker.service
 
 import bista.shiddarth.dotacounterpicker.exception.InvalidHeroNameException
-import org.junit.jupiter.api.Test
-
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.Test
 import org.springframework.web.reactive.function.client.WebClient
 
 class CounterServiceTest {
@@ -35,7 +32,6 @@ class CounterServiceTest {
                 counterService.getHeroIdFromHeroName(invalidHeroName)
             }
             assertThat(exception.message).isEqualTo("Cannot find such hero in the Archronicus")
-
         }
     }
 }

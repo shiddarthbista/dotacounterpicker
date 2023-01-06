@@ -25,7 +25,7 @@ class CounterService(val openDotaClient: WebClient) {
         }
         val heroNameOfCounters = heroIdOfCounters.map { heroNameList ->
             heroNameList.map { heroId ->
-                HeroMap.heroIdMap.entries.first { it.value == heroId }.key
+                getHeroNameFromHeroId(heroId)
             }
         }
         return heroNameOfCounters
@@ -68,14 +68,20 @@ class CounterService(val openDotaClient: WebClient) {
         val response = responseFromMatchupsEndpoint(heroId1)
         return response.filter { it.heroId == heroId2 }
             .map {heroStat->
-                val winRate = (heroStat.wins.toDouble() / heroStat.gamesPlayed.toDouble()) * 100
+                var winRate = (heroStat.wins.toDouble() / heroStat.gamesPlayed.toDouble()) * 100
                 val heroIdWinner = if (winRate > 50) heroId2 else heroId1
-                val winner = HeroMap.heroIdMap.entries.first { it.value == heroIdWinner }.key
+                if (heroIdWinner == heroId1){
+                    winRate = 100 - winRate
+                }
+                val winner = getHeroNameFromHeroId(heroIdWinner)
                 MatchupWinner(winner, String.format("%.2f", winRate).toDouble())
             }
             .single()
 
     }
+
+    private fun getHeroNameFromHeroId(heroId: Int) =
+        HeroMap.heroIdMap.entries.first { it.value == heroId }.key
 
 
 }
