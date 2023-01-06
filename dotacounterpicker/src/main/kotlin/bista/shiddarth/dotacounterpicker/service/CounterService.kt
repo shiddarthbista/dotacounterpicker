@@ -21,12 +21,11 @@ class CounterService(val openDotaClient: WebClient) {
         val heroIdOfCounters = heroStatsList.map { heroStatsMutableList ->
             heroStatsMutableList.map { it.heroId }
         }
-        val heroNameOfCounters = heroIdOfCounters.map { heroNameList ->
+        return heroIdOfCounters.map { heroNameList ->
             heroNameList.map { heroId ->
                 ConverterUtils.getHeroNameFromHeroId(heroId)
             }
         }
-        return heroNameOfCounters
     }
 
     fun getTopFiveCounterHeroStats(heroId: Int): Mono<MutableList<HeroStats>> {
@@ -43,11 +42,9 @@ class CounterService(val openDotaClient: WebClient) {
             .collectList()
     }
 
-    fun responseFromMatchupsEndpoint(heroId: Int): Flux<HeroStats> {
-        return openDotaClient.get()
-            .uri("heroes/$heroId/matchups")
-            .retrieve()
-            .bodyToFlux(HeroStats::class.java)
-    }
+    fun responseFromMatchupsEndpoint(heroId: Int): Flux<HeroStats> = openDotaClient.get()
+        .uri("heroes/$heroId/matchups")
+        .retrieve()
+        .bodyToFlux(HeroStats::class.java)
 
 }
