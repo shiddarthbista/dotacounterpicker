@@ -3,7 +3,6 @@ package bista.shiddarth.dotacounterpicker.service
 import bista.shiddarth.dotacounterpicker.exception.InvalidHeroNameException
 import bista.shiddarth.dotacounterpicker.model.HeroMap
 import bista.shiddarth.dotacounterpicker.model.HeroStats
-import bista.shiddarth.dotacounterpicker.model.MatchupWinner
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -54,34 +53,14 @@ class CounterService(val openDotaClient: WebClient) {
             .collectList()
     }
 
-    private fun responseFromMatchupsEndpoint(heroId: Int): Flux<HeroStats> {
+    fun responseFromMatchupsEndpoint(heroId: Int): Flux<HeroStats> {
         return openDotaClient.get()
             .uri("heroes/$heroId/matchups")
             .retrieve()
             .bodyToFlux(HeroStats::class.java)
     }
 
-    fun getWinner(heroName1: String, heroName2: String): Mono<MatchupWinner> {
-        val heroId1 = getHeroIdFromHeroName(heroName1)
-        val heroId2 = getHeroIdFromHeroName(heroName2)
-
-        val response = responseFromMatchupsEndpoint(heroId1)
-        return response.filter { it.heroId == heroId2 }
-            .map {heroStat->
-                var winRate = (heroStat.wins.toDouble() / heroStat.gamesPlayed.toDouble()) * 100
-                val heroIdWinner = if (winRate > 50) heroId2 else heroId1
-                if (heroIdWinner == heroId1){
-                    winRate = 100 - winRate
-                }
-                val winner = getHeroNameFromHeroId(heroIdWinner)
-                MatchupWinner(winner, String.format("%.2f", winRate).toDouble())
-            }
-            .single()
-
-    }
-
-    private fun getHeroNameFromHeroId(heroId: Int) =
+    fun getHeroNameFromHeroId(heroId: Int) =
         HeroMap.heroIdMap.entries.first { it.value == heroId }.key
-
-
+    
 }
