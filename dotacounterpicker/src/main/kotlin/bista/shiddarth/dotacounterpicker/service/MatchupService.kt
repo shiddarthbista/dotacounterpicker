@@ -9,8 +9,7 @@ import reactor.core.publisher.Mono
 @Service
 class MatchupService (private val counterService: CounterService){
     private val log = LoggerFactory.getLogger(this::class.java)
-
-
+    
     fun getWinner(heroName1: String, heroName2: String): Mono<MatchupWinner> {
         log.info("$heroName1 versus $heroName2")
         val heroId1 = ConverterUtils.getHeroIdFromHeroName(heroName1)
