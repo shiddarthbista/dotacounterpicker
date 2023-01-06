@@ -1,6 +1,7 @@
 package bista.shiddarth.dotacounterpicker.service
 
 import bista.shiddarth.dotacounterpicker.exception.InvalidHeroNameException
+import bista.shiddarth.dotacounterpicker.utils.ConverterUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
@@ -20,18 +21,18 @@ class CounterServiceTest {
             val validHeroName = "axe"
             val validNameWithSpace = "beastm aster"
             val alternateCasing = "sNAp"
-            assertThat(counterService.getHeroIdFromHeroName(validHeroName)).isEqualTo(2)
-            assertThat(counterService.getHeroIdFromHeroName(validNameWithSpace)).isEqualTo(38)
-            assertThat(counterService.getHeroIdFromHeroName(alternateCasing)).isEqualTo(128)
+            assertThat(ConverterUtils.getHeroIdFromHeroName(validHeroName)).isEqualTo(2)
+            assertThat(ConverterUtils.getHeroIdFromHeroName(validNameWithSpace)).isEqualTo(38)
+            assertThat(ConverterUtils.getHeroIdFromHeroName(alternateCasing)).isEqualTo(128)
         }
 
         @Test
         fun `when hero name is not in map throw invalidHeroException`() {
             val invalidHeroName = "Volley"
             val exception = Assertions.assertThrows(InvalidHeroNameException::class.java) {
-                counterService.getHeroIdFromHeroName(invalidHeroName)
+                ConverterUtils.getHeroIdFromHeroName(invalidHeroName)
             }
-            assertThat(exception.message).isEqualTo("Cannot find such hero in the Archronicus")
+            assertThat(exception.message).isEqualTo("Volley does not exist in the Archronicus.")
         }
     }
 }
