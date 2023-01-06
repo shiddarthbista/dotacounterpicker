@@ -3,21 +3,28 @@ package bista.shiddarth.dotacounterpicker.service
 import bista.shiddarth.dotacounterpicker.exception.InvalidHeroNameException
 import bista.shiddarth.dotacounterpicker.model.HeroMap
 import bista.shiddarth.dotacounterpicker.model.HeroStats
+import bista.shiddarth.dotacounterpicker.model.MatchupWinner
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
 class CounterService(val openDotaClient: WebClient) {
 
+    private val log = LoggerFactory.getLogger(this::class.java)
+
     fun getTopFiveCounters(heroName: String): Mono<List<String>> {
+        log.info("Received request to get counters for $heroName")
         val heroId = getHeroIdFromHeroName(heroName)
+        log.info("Hero id for $heroName is $heroId")
         val heroStatsList = getTopFiveCounterHeroStats(heroId)
         val heroIdOfCounters = heroStatsList.map { heroStatsMutableList ->
             heroStatsMutableList.map { it.heroId }
         }
         val heroNameOfCounters = heroIdOfCounters.map { heroNameList ->
-            heroNameList.map {heroId ->
+            heroNameList.map { heroId ->
                 HeroMap.heroIdMap.entries.first { it.value == heroId }.key
             }
         }
@@ -34,10 +41,7 @@ class CounterService(val openDotaClient: WebClient) {
     }
 
     fun getTopFiveCounterHeroStats(heroId: Int): Mono<MutableList<HeroStats>> {
-        val response = openDotaClient.get()
-            .uri("heroes/$heroId/matchups")
-            .retrieve()
-            .bodyToFlux(HeroStats::class.java)
+        val response = responseFromMatchupsEndpoint(heroId)
 
         return response
             .filter { it.gamesPlayed > 10 }
@@ -48,6 +52,29 @@ class CounterService(val openDotaClient: WebClient) {
             }
             .take(5)
             .collectList()
+    }
+
+    private fun responseFromMatchupsEndpoint(heroId: Int): Flux<HeroStats> {
+        return openDotaClient.get()
+            .uri("heroes/$heroId/matchups")
+            .retrieve()
+            .bodyToFlux(HeroStats::class.java)
+    }
+
+    fun getWinner(heroName1: String, heroName2: String): Mono<MatchupWinner> {
+        val heroId1 = getHeroIdFromHeroName(heroName1)
+        val heroId2 = getHeroIdFromHeroName(heroName2)
+
+        val response = responseFromMatchupsEndpoint(heroId1)
+        return response.filter { it.heroId == heroId2 }
+            .map {heroStat->
+                val winRate = (heroStat.wins.toDouble() / heroStat.gamesPlayed.toDouble()) * 100
+                val heroIdWinner = if (winRate > 50) heroId2 else heroId1
+                val winner = HeroMap.heroIdMap.entries.first { it.value == heroIdWinner }.key
+                MatchupWinner(winner, String.format("%.2f", winRate).toDouble())
+            }
+            .single()
+
     }
 
 

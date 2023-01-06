@@ -12,4 +12,8 @@ class CounterController(private val counterService: CounterService) {
     @GetMapping("/counters/{heroName}")
     fun getCounters(@PathVariable heroName:String) =
         counterService.getTopFiveCounters(heroName)
+
+    @GetMapping("/{heroName1}/versus/{heroName2}")
+    fun getWinner(@PathVariable heroName1: String ,@PathVariable heroName2: String) =
+        counterService.getWinner(heroName1,heroName2)
 }
