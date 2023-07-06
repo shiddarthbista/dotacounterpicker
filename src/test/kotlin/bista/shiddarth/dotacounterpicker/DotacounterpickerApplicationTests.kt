@@ -1,0 +1,13 @@
+package bista.shiddarth.dotacounterpicker
+
+import org.junit.jupiter.api.Test
+import org.springframework.boot.test.context.SpringBootTest
+
+@SpringBootTest
+class DotacounterpickerApplicationTests {
+
+	@Test
+	fun contextLoads() {
+	}
+
+}
